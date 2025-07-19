@@ -7,7 +7,6 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
-//LOGIN
 
 export const loginUser = asyncHandler(async (req, res) => {
   const { identifier, password } = req.body;
@@ -94,7 +93,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 15 * 60 * 1000, // 15 minutes
+    maxAge: refreshTokenExpiryDays * 24 * 60 * 60 * 1000, // 15 minutes
   });
 
   // Set refreshToken cookie
@@ -113,20 +112,26 @@ export const loginUser = asyncHandler(async (req, res) => {
         email: user.email,
         username: user.userInfo?.Username,
         role: user.role || "user",
-        accessToken: accessToken,
-        refreshToken: refreshToken,
+        // You might want to return the tokens in the response body as well,
+        // especially for mobile clients that don't handle cookies automatically.
+        // accessToken: accessToken,
+        // refreshToken: refreshToken,
       },
       "Login successful"
     )
   );
 });
 
-// REGISTER
 export const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
     throw new ApiError(400, "All fields are required");
+  }
+
+  // Enforce minimum password length
+  if (password.length < 8) {
+    throw new ApiError(400, "Password must be at least 8 characters long.");
   }
 
   const existingUser = await prisma.users.findFirst({
@@ -204,7 +209,6 @@ export const verifyOtp = asyncHandler(async (req, res) => {
   );
 });
 
-//  LOGOUT
 export const logoutUser = asyncHandler(async (req, res) => {
   // Clear the accessToken cookie
   res.clearCookie("accessToken", {
@@ -226,8 +230,6 @@ export const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 
-//  REQUEST PASSWORD RESET (Sends OTP to email)
-// This is typically a separate endpoint that a user hits to initiate the password reset process.
 export const requestPasswordReset = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
@@ -276,12 +278,14 @@ export const requestPasswordReset = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(200, { email }, "Password reset OTP sent to your email.")
+      new ApiResponse(
+        200,
+        { email, otpValue },
+        "Password reset OTP sent to your email."
+      )
     );
 });
 
-//  RESET PASSWORD (Verifies OTP and sets new password)
-// This is the endpoint where the user submits the OTP and their new password.
 export const resetPassword = asyncHandler(async (req, res) => {
   const { email, otp, newPassword } = req.body;
 

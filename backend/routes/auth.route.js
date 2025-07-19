@@ -1,6 +1,7 @@
 import express from "express";
 import {
   loginUser,
+  logoutUser,
   registerUser,
   requestPasswordReset,
   resetPassword,
@@ -13,4 +14,6 @@ route.post("/verify-otp", verifyOtp);
 route.post("/login", loginUser);
 route.post("/req-reset-password", requestPasswordReset);
 route.post("/reset-password", resetPassword);
+route.post("/logout", logoutUser);
+
 export default route;
