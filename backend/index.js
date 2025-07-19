@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.route.js";
 import aiRoutes from "./routes/ai.route.js";
-
+import gameRoutes from "./routes/game.route.js";
 dotenv.config(); // ✅ Load environment variables early
 
 const app = express();
@@ -26,6 +26,7 @@ app.use(cookieParser()); // ✅ Required for reading cookies
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/game", gameRoutes);
 
 // Start server
 app.listen(port, () => {

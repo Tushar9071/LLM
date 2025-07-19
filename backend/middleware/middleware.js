@@ -63,6 +63,8 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
           updatedAt: true,
         },
       },
+      gamePoints: true,
+      userLanguage: true,
     },
   });
 

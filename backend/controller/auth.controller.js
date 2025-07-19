@@ -160,7 +160,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 });
 
 export const verifyOtp = asyncHandler(async (req, res) => {
-  const { email, otp, username, password } = req.body;
+  const { email, username, password,otp } = req.body;
 
   if (!email || !otp || !username || !password) {
     throw new ApiError(400, "All fields are required");
@@ -260,6 +260,7 @@ export const requestPasswordReset = asyncHandler(async (req, res) => {
 
   // Generate a new OTP
   const otpValue = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log(`Generated OTP for ${email}: ${otpValue}`); // For debugging purposes
   // Set OTP expiry (e.g., 10 minutes from now)
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
@@ -390,3 +391,176 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
     )
   );
 });
+
+export const updateAccountDetails = asyncHandler(async (req, res) => {
+  if (!req.user || !req.user.id) {
+    throw new ApiError(401, "Unauthorized: User not logged in.");
+  }
+
+  const userId = req.user.id;
+
+  const {
+    firstname,
+    lastname,
+    Username,
+    phone,
+    gender,
+    dob,
+    proficiencyLevel,
+    learningGoals,
+    dailyXPGoal, // moved to gamePoints
+    learningFocus,
+    dailyReminders,
+    weeklyProgressReports,
+    achievementNotifications,
+    newFeatureAnnouncements,
+  } = req.body;
+
+  // Prevent updates to sensitive fields
+  if (req.body.email || req.body.password) {
+    throw new ApiError(400, "Email and password cannot be updated through this endpoint.");
+  }
+
+  if (req.body.avatar) {
+    throw new ApiError(400, "Profile picture (avatar) cannot be updated through this endpoint.");
+  }
+
+  const existingUserInfo = await prisma.userInfo.findUnique({
+    where: { userId: userId },
+  });
+
+  if (!existingUserInfo) {
+    throw new ApiError(404, "User profile not found. Please ensure your account is fully registered.");
+  }
+
+  const userInfoUpdateData = {};
+
+  // Username uniqueness check
+  if (Username !== undefined && Username !== existingUserInfo.Username) {
+    const usernameExists = await prisma.userInfo.findFirst({
+      where: { Username },
+    });
+    if (usernameExists && usernameExists.userId !== userId) {
+      throw new ApiError(409, "Username already taken.");
+    }
+    userInfoUpdateData.Username = Username;
+  }
+
+  // Phone uniqueness check
+  if (phone !== undefined && phone !== existingUserInfo.phone) {
+    const phoneExists = await prisma.userInfo.findFirst({
+      where: { phone },
+    });
+    if (phoneExists && phoneExists.userId !== userId) {
+      throw new ApiError(409, "Phone number already in use.");
+    }
+    userInfoUpdateData.phone = phone;
+  }
+
+  // Optional fields
+  if (firstname !== undefined) userInfoUpdateData.firstname = firstname;
+  if (lastname !== undefined) userInfoUpdateData.lastname = lastname;
+  if (gender !== undefined) userInfoUpdateData.gender = gender;
+
+  // DOB validation
+  if (dob !== undefined) {
+    const parsedDate = new Date(dob);
+    if (isNaN(parsedDate.getTime())) {
+      throw new ApiError(400, "Invalid date of birth.");
+    }
+    userInfoUpdateData.dob = parsedDate;
+  }
+
+  if (proficiencyLevel !== undefined) userInfoUpdateData.proficiencyLevel = proficiencyLevel;
+  if (learningGoals !== undefined) userInfoUpdateData.learningGoals = learningGoals;
+
+  // learningFocus must be an array
+  if (learningFocus !== undefined) {
+    if (!Array.isArray(learningFocus)) {
+      throw new ApiError(400, "learningFocus must be an array.");
+    }
+    userInfoUpdateData.learningFocus = learningFocus;
+  }
+
+  // Notification preferences
+  if (dailyReminders !== undefined) userInfoUpdateData.dailyReminders = dailyReminders;
+  if (weeklyProgressReports !== undefined) userInfoUpdateData.weeklyProgressReports = weeklyProgressReports;
+  if (achievementNotifications !== undefined) userInfoUpdateData.achievementNotifications = achievementNotifications;
+  if (newFeatureAnnouncements !== undefined) userInfoUpdateData.newFeatureAnnouncements = newFeatureAnnouncements;
+
+  // Return current data if nothing to update in userInfo
+  if (Object.keys(userInfoUpdateData).length === 0 && dailyXPGoal === undefined) {
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      include: { userInfo: true },
+    });
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          ...user.userInfo,
+        },
+        "No profile changes submitted."
+      )
+    );
+  }
+
+  // Update userInfo if fields provided
+  if (Object.keys(userInfoUpdateData).length > 0) {
+    try {
+      console.log("🟡 Updating userInfo with:", userInfoUpdateData);
+      await prisma.userInfo.update({
+        where: { userId: userId },
+        data: userInfoUpdateData,
+      });
+    } catch (dbError) {
+      console.error("❌ Prisma userInfo update error:", dbError);
+      throw new ApiError(500, "Failed to update profile details. Please try again.");
+    }
+  }
+
+  // Update gamePoints.dailyXPGoal if provided
+  if (dailyXPGoal !== undefined) {
+    try {
+await prisma.gamePoints.upsert({
+  where: { userId: userId },
+  update: { dailyXPGoal: dailyXPGoal },
+  create: {
+    userId: userId,
+    dailyXPGoal: dailyXPGoal,
+    // default values required for creation
+    points: 0,
+    xp: 0,
+    streak: 0
+  },
+});
+
+    } catch (err) {
+      console.error("❌ Failed to update dailyXPGoal in gamePoints:", err);
+      throw new ApiError(500, "Failed to update daily XP goal.");
+    }
+  }
+
+  // Return updated profile
+  const updatedUser = await prisma.users.findUnique({
+    where: { id: userId },
+    include: { userInfo: true },
+  });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        ...updatedUser.userInfo,
+      },
+      "Account details updated successfully."
+    )
+  );
+});
+
