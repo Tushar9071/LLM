@@ -24,7 +24,7 @@ const SignupPage = () => {
     setIsLoading(true);
     try {
       await signup(name, email, password);
-      navigate('/dashboard');
+      navigate('/otppage');
     } catch (err) {
       setError('There was a problem creating your account. Please try again.');
     } finally {
