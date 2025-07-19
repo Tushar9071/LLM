@@ -42,58 +42,58 @@ export const AuthProvider: React.FC<{
 }> = ({
   children
 }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  // Check for existing session on mount
-  useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-      setIsAuthenticated(true);
-    }
-  }, []);
-  const login = async (email: string, password: string) => {
-    // Mock login - in a real app, this would be an API call
-    return new Promise<void>(resolve => {
-      setTimeout(() => {
-        setUser(MOCK_USER);
+    const [user, setUser] = useState<User | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    // Check for existing session on mount
+    useEffect(() => {
+      const savedUser = localStorage.getItem('user');
+      if (savedUser) {
+        setUser(JSON.parse(savedUser));
         setIsAuthenticated(true);
-        localStorage.setItem('user', JSON.stringify(MOCK_USER));
-        resolve();
-      }, 1000);
-    });
-  };
-  const signup = async (name: string, email: string, password: string) => {
-    // Mock signup - in a real app, this would be an API call
-    return new Promise<void>(resolve => {
-      setTimeout(() => {
-        const newUser = {
-          ...MOCK_USER,
-          name,
-          email,
-          level: 1,
-          xp: 0,
-          streak: 0
-        };
-        setUser(newUser);
-        setIsAuthenticated(true);
-        localStorage.setItem('user', JSON.stringify(newUser));
-        resolve();
-      }, 1000);
-    });
-  };
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('user');
-  };
-  return <AuthContext.Provider value={{
-    user,
-    isAuthenticated,
-    login,
-    signup,
-    logout
-  }}>
+      }
+    }, []);
+    const login = async (email: string, password: string) => {
+      // Mock login - in a real app, this would be an API call
+      return new Promise<void>(resolve => {
+        setTimeout(() => {
+          setUser(MOCK_USER);
+          setIsAuthenticated(true);
+          localStorage.setItem('user', JSON.stringify(MOCK_USER));
+          resolve();
+        }, 1000);
+      });
+    };
+    const signup = async (name: string, email: string, password: string) => {
+      // Mock signup - in a real app, this would be an API call
+      return new Promise<void>(resolve => {
+        setTimeout(() => {
+          const newUser = {
+            ...MOCK_USER,
+            name,
+            email,
+            level: 1,
+            xp: 0,
+            streak: 0
+          };
+          setUser(newUser);
+          setIsAuthenticated(true);
+          localStorage.setItem('user', JSON.stringify(newUser));
+          resolve();
+        }, 1000);
+      });
+    };
+    const logout = () => {
+      setUser(null);
+      setIsAuthenticated(false);
+      localStorage.removeItem('user');
+    };
+    return <AuthContext.Provider value={{
+      user,
+      isAuthenticated,
+      login,
+      signup,
+      logout
+    }}>
       {children}
     </AuthContext.Provider>;
-};
+  };
