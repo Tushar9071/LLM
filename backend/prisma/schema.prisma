@@ -23,10 +23,8 @@ model users {
   id         Int       @id @default(autoincrement())
   email      String    @unique
   password   String?
-  // Corrected relation field name for the one-to-one relationship
-  // This field allows you to access the related 'userInfo' model from 'users'
-  userInfo   userInfo? // <--- CHANGE THIS LINE
-  session    session?
+  userInfo   userInfo?
+  session    session? // One-to-one relation to the session model
   visibility Boolean   @default(true)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
@@ -53,19 +51,19 @@ model userInfo {
 
 model session {
   id        Int      @id @default(autoincrement())
-  userId    Int      @unique
-  token     String   @unique
+  userId    Int      @unique // Ensures one session per user if you only store refresh tokens
+  token     String   @unique // Stores the refresh token
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      users    @relation(fields: [userId], references: [id])
+  user      users    @relation(fields: [userId], references: [id]) // Relation to the user who owns this session
 
   @@map("session")
 }
 
 model otp {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
-  otp       String   @unique
+  email     String   @unique // Email is unique, ensuring one active OTP per email
+  otp       String // Removed @unique constraint from here
   expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
