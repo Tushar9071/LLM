@@ -21,6 +21,7 @@ import ScrollToTop from './components/ScrollToTop';
 import Footer from './components/Footer';
 import ThemeInitializer from './components/ThemeInitializer';
 import ProtectedRoute from './components/ProtectedRoute'; // ✅ Import this
+import OTPPageReset from './pages/otpForReset';
 
 export function App() {
   return (
@@ -38,6 +39,9 @@ export function App() {
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignupPage />} />
                   <Route path="/otppage" element={<OTPPage />} />
+                  <Route path="/otpForReset" element={<OTPPageReset />} />
+
+                  {/* ✅ Public Routes */}
                   <Route path="/forgetpass" element={<ForgotPasswordPage />} />
 
                   {/* ✅ Protected Routes */}
