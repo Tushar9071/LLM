@@ -342,57 +342,86 @@ export const resetPassword = asyncHandler(async (req, res) => {
 });
 
 export const getCurrentUser = asyncHandler(async (req, res) => {
-  // Ensure the user is authenticated.
-  // The `req.user` object is expected to be populated by an authentication middleware.
-  if (!req.user || !req.user.id) {
-    throw new ApiError(401, "Unauthorized: User not logged in.");
+  const userId = req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized: No user ID found.",
+    });
   }
 
-  // Fetch the user from the database using the ID from the authenticated request.
-  // We include `userInfo` to get all associated profile details.
   const user = await prisma.users.findUnique({
-    where: {
-      id: req.user.id, // Assuming req.user.id holds the user's unique ID
-    },
+    where: { id: userId },
     include: {
-      userInfo: true, // Include related user information
+      userInfo: true,
+      gamePoints: true,
+      userLanguage: true,
     },
   });
 
-  // If for some reason the user is not found (e.g., deleted after authentication),
-  // though this should ideally be caught by middleware.
   if (!user) {
-    throw new ApiError(404, "User not found.");
+    return res.status(404).json({
+      success: false,
+      message: "User not found.",
+    });
   }
 
-  // Return the user details, excluding sensitive information like the hashed password.
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        // Spread userInfo directly if it exists, otherwise provide default or null
-        ...(user.userInfo && {
-          username: user.userInfo.Username, // Assuming 'Username' field in userInfo
-          displayName: user.userInfo.displayName,
-          avatar: user.userInfo.avatar,
-          nativeLanguage: user.userInfo.nativeLanguage,
-          targetLanguage: user.userInfo.targetLanguage,
-          proficiencyLevel: user.userInfo.proficiencyLevel,
-          learningGoals: user.userInfo.learningGoals,
-          // Add other userInfo fields as per your schema
-        }),
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
-      "Current user details fetched successfully."
-    )
-  );
+  const {
+    id,
+    email,
+    role,
+    createdAt,
+    updatedAt,
+    userInfo,
+    gamePoints,
+    userLanguage,
+  } = user;
+
+  const response = {
+    id,
+    email,
+    role,
+    createdAt,
+    updatedAt,
+
+    // userInfo fields
+    username: userInfo?.Username ?? null,
+    displayName: userInfo?.displayName ?? null,
+    avatar: userInfo?.avatar ?? "https://avatar.iran.liara.run/public/boy",
+    phone: userInfo?.phone ?? null,
+    gender: userInfo?.gender ?? null,
+    dob: userInfo?.dob ?? null,
+    proficiencyLevel: userInfo?.proficiencyLevel ?? null,
+    learningGoals: userInfo?.learningGoals ?? null,
+    learningFocus: userInfo?.learningFocus ?? [],
+    bio: userInfo?.bio ?? null,
+    country: userInfo?.country ?? null,
+    nativeLanguage: userInfo?.nativeLanguage ?? null,
+    timeZone: userInfo?.timeZone ?? null,
+
+    // Notification Preferences
+    notificationPreferences: {
+      dailyReminders: userInfo?.dailyReminders ?? true,
+      weeklyProgressReports: userInfo?.weeklyProgressReports ?? true,
+      achievementNotifications: userInfo?.achievementNotifications ?? true,
+      newFeatureAnnouncements: userInfo?.newFeatureAnnouncements ?? true,
+    },
+
+    // Languages
+    languages: userLanguage ?? [],
+  };
+
+  return res.status(200).json({
+    success: true,
+    message: "User profile fetched successfully.",
+    data: response,
+  });
 });
 
+
 export const updateAccountDetails = asyncHandler(async (req, res) => {
+
   if (!req.user || !req.user.id) {
     throw new ApiError(401, "Unauthorized: User not logged in.");
   }
@@ -414,26 +443,26 @@ export const updateAccountDetails = asyncHandler(async (req, res) => {
     weeklyProgressReports,
     achievementNotifications,
     newFeatureAnnouncements,
-  } = req.body;
+    } = req.body;
 
-  // Prevent updates to sensitive fields
-  if (req.body.email || req.body.password) {
+   // Prevent updates to sensitive fields
+   if (req.body.email || req.body.password) {
     throw new ApiError(400, "Email and password cannot be updated through this endpoint.");
-  }
+   }
 
-  if (req.body.avatar) {
+   if (req.body.avatar) {
     throw new ApiError(400, "Profile picture (avatar) cannot be updated through this endpoint.");
-  }
+   }
 
-  const existingUserInfo = await prisma.userInfo.findUnique({
+   const existingUserInfo = await prisma.userInfo.findUnique({
     where: { userId: userId },
-  });
+   });
 
-  if (!existingUserInfo) {
-    throw new ApiError(404, "User profile not found. Please ensure your account is fully registered.");
-  }
+    if (!existingUserInfo) {
+      throw new ApiError(404, "User profile not found. Please ensure your account is fully registered.");
+    }
 
-  const userInfoUpdateData = {};
+    const userInfoUpdateData = {};
 
   // Username uniqueness check
   if (Username !== undefined && Username !== existingUserInfo.Username) {

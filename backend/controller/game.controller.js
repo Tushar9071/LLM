@@ -7,11 +7,6 @@ const prisma = new PrismaClient();
 export const wordMeaning = async (req, res) => {
   try {
     const user = req.user;
-    // console.log("User:", user);
-
-    res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.setHeader("Transfer-Encoding", "chunked");
-    res.setHeader("Cache-Control", "no-cache");
 
     const targetLanguage =
       user?.userLanguage?.[0]?.learning_language || "English";
@@ -63,6 +58,7 @@ Now output **only 5 word pairs in the exact format above.**
     const decoder = new TextDecoder();
 
     let buffer = "";
+    let fullResponse = ""; // 👈 collect everything here
 
     while (true) {
       const { done, value } = await reader.read();
@@ -70,7 +66,7 @@ Now output **only 5 word pairs in the exact format above.**
 
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split("\n");
-      buffer = lines.pop(); // keep the last incomplete line for next chunk
+      buffer = lines.pop(); // keep the last incomplete line
 
       for (const line of lines) {
         if (!line.trim()) continue;
@@ -78,22 +74,26 @@ Now output **only 5 word pairs in the exact format above.**
         try {
           const json = JSON.parse(line);
           if (json.response) {
-            res.write(json.response);
+            fullResponse += json.response; // 👈 accumulate
           }
         } catch (err) {
-          // If it’s not valid JSON, skip it
-          console.warn("Skipping invalid JSON chunk:", line);
+          console.warn("Skipping invalid JSON chunk :", line);
           continue;
         }
       }
-    }
+    } 
 
-    res.end();
+    // Once finished, send full response
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache");
+    res.send(fullResponse.trim()); // 👈 single full output
+
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error while streaming AI response.");
+    res.status(500).send("Error while processing AI response.");
   }
 };
+
 
 export const givePointsForWordGame = async (req, res) => {
   try {
