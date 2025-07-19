@@ -23,7 +23,7 @@ const LoginPage = () => {
     setError('');
     setIsLoading(true);
     try {
-      const data = await fetch("/api/auth/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +33,11 @@ const LoginPage = () => {
           "password": password
         }),
       })
-      console.log(data);
+      console.log(res);
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.message || 'Login failed');
+      }
 
       await login(email, password);
       navigate('/dashboard');
