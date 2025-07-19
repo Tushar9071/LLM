@@ -12,7 +12,7 @@ import OCRScanPage from './pages/OCRScanPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
-import OTPPage from './pages/otppage';
+import OTPPageReset from './pages/otpForReset';
 import ForgotPasswordPage from './pages/forgetpass';
 
 // Components
@@ -37,7 +37,7 @@ export function App() {
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignupPage />} />
-                  <Route path="/otppage" element={<OTPPage />} />
+                  <Route path="/otppage" element={<OTPPageReset />} />
                   <Route path="/forgetpass" element={<ForgotPasswordPage />} />
 
                   {/* ✅ Protected Routes */}

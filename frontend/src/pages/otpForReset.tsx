@@ -1,26 +1,35 @@
 import React, { useState, useRef, useEffect, CSSProperties } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Button from "../components/Button";
 
-const OTPPage: React.FC = () => {
+const OTPPageReset: React.FC = () => {
   const [digits, setDigits] = useState<string[]>(Array(6).fill(""));
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shake, setShake] = useState(false);
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get data passed from forgetpass page
+  const { email, newPassword } = location.state || {};
+
+  useEffect(() => {
+    if (!email || !newPassword) {
+      // If user navigates here directly, redirect to forgetpass
+      navigate("/forgetpass");
+    }
+  }, [email, newPassword, navigate]);
 
   const handleDigitChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
-    
     const newDigits = [...digits];
     newDigits[index] = value;
     setDigits(newDigits);
-    
+
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
-    
     if (index === 5 && value && newDigits.every(d => d !== "")) {
       handleSubmit();
     }
@@ -36,7 +45,6 @@ const OTPPage: React.FC = () => {
     e.preventDefault();
     const paste = e.clipboardData.getData("text");
     const pasteDigits = paste.match(/\d/g)?.slice(0, 6) || [];
-    
     if (pasteDigits.length === 6) {
       setDigits(pasteDigits);
       inputRefs.current[5]?.focus();
@@ -53,13 +61,32 @@ const OTPPage: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    
+    setError("");
+
     try {
-      // Simulate API verification
-      await new Promise(resolve => setTimeout(resolve, 800));
-      navigate("/dashboard");
-    } catch (err) {
-      setError("Verification failed. Please try again.");
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          otp,
+          newPassword,
+        }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.message || "OTP verification failed.");
+      }
+
+      // Success: navigate to login or show success message
+      navigate("/login", { state: { resetSuccess: true } });
+    } catch (err: any) {
+      setError(err.message || "Verification failed. Please try again.");
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -68,11 +95,10 @@ const OTPPage: React.FC = () => {
     inputRefs.current[0]?.focus();
   }, []);
 
-  // CSS-in-JS solution for shake animation
-  const shakeAnimation: CSSProperties = shake 
+  const shakeAnimation: CSSProperties = shake
     ? {
-        animation: 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both'
-      }
+      animation: 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both'
+    }
     : {};
 
   return (
@@ -86,8 +112,7 @@ const OTPPage: React.FC = () => {
           }
         `}
       </style>
-      
-      <div 
+      <div
         className="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl"
         style={shakeAnimation}
       >
@@ -124,15 +149,14 @@ const OTPPage: React.FC = () => {
               onChange={e => handleDigitChange(index, e.target.value)}
               onKeyDown={e => handleKeyDown(index, e)}
               onPaste={handlePaste}
-              className={`w-14 h-14 text-3xl text-center border-2 rounded-xl bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-4 focus:ring-indigo-300 dark:focus:ring-indigo-600 transition-all duration-200 ${
-                digit ? "border-indigo-500 shadow-sm" : "border-gray-300 dark:border-gray-600"
-              } hover:border-indigo-400 dark:hover:border-indigo-500 shadow-sm transform hover:scale-105 focus:scale-105`}
+              className={`w-14 h-14 text-3xl text-center border-2 rounded-xl bg-white dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-4 focus:ring-indigo-300 dark:focus:ring-indigo-600 transition-all duration-200 ${digit ? "border-indigo-500 shadow-sm" : "border-gray-300 dark:border-gray-600"
+                } hover:border-indigo-400 dark:hover:border-indigo-500 shadow-sm transform hover:scale-105 focus:scale-105`}
               disabled={isSubmitting}
             />
           ))}
         </div>
 
-        <Button 
+        <Button
           onClick={handleSubmit}
           fullWidth
           disabled={digits.some(d => d === "") || isSubmitting}
@@ -151,10 +175,11 @@ const OTPPage: React.FC = () => {
         </Button>
 
         <div className="mt-6 text-center text-gray-600 dark:text-gray-400">
-          <p>Didn't receive the code? 
-            <button 
+          <p>Didn't receive the code?
+            <button
               className="ml-2 text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors duration-200"
-              onClick={() => console.log("Resend OTP")}
+              onClick={() => window.location.reload()}
+              disabled={isSubmitting}
             >
               Resend OTP
             </button>
@@ -165,4 +190,4 @@ const OTPPage: React.FC = () => {
   );
 };
 
-export default OTPPage;
+export default OTPPageReset;
