@@ -13,6 +13,7 @@ const LoginPage = () => {
   const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
 
+
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -22,6 +23,18 @@ const LoginPage = () => {
     setError('');
     setIsLoading(true);
     try {
+      const data = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          "identifier": email,
+          "password": password
+        }),
+      })
+      console.log(data);
+
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
@@ -107,7 +120,7 @@ const LoginPage = () => {
           </div>
         </div>
         <div>
-          <Button type="submit" fullWidth size="lg" disabled={isLoading}>
+          <Button type="submit" fullWidth size="lg" disabled={isLoading} >
             {isLoading ? 'Signing in...' : 'Sign in'}
           </Button>
         </div>
