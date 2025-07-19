@@ -31,7 +31,6 @@ export const generateRefreshToken = (user) => {
       { expiresIn: process.env.REFRESH_TOKEN_EXPIRY || "7d" } // Default to 7d
     );
 
-
     return token;
   } catch (error) {
     console.error("Error generating refresh token:", error);

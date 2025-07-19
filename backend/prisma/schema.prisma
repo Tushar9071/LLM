@@ -23,7 +23,9 @@ model users {
   id         Int       @id @default(autoincrement())
   email      String    @unique
   password   String?
-  userInfoId userInfo?
+  // Corrected relation field name for the one-to-one relationship
+  // This field allows you to access the related 'userInfo' model from 'users'
+  userInfo   userInfo? // <--- CHANGE THIS LINE
   session    session?
   visibility Boolean   @default(true)
   createdAt  DateTime  @default(now())
@@ -43,8 +45,8 @@ model userInfo {
   visibility Boolean   @default(true)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
-  userId     Int       @unique
-  user       users     @relation(fields: [userId], references: [id])
+  userId     Int       @unique // The foreign key in userInfo pointing to users.id
+  user       users     @relation(fields: [userId], references: [id]) // The relation field in userInfo to users
 
   @@map("userinfo")
 }
@@ -58,4 +60,13 @@ model session {
   user      users    @relation(fields: [userId], references: [id])
 
   @@map("session")
+}
+
+model otp {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  otp       String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
