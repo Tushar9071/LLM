@@ -20,31 +20,48 @@ enum Gender {
 }
 
 model users {
-  id         Int       @id @default(autoincrement())
-  email      String    @unique
-  password   String?
-  userInfoId userInfo?
-  session    session?
-  visibility Boolean   @default(true)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  password     String?
+  role         String         @default("user") // ✅ added role field by user
+  userInfo     userInfo?
+  session      session?
+  visibility   Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  gamePoints   gamePoints[]
+  userLanguage userLanguage[]
 
   @@map("users")
 }
 
 model userInfo {
-  id         Int       @id @default(autoincrement())
-  firstname  String?
-  lastname   String?
-  Username   String?   @unique
-  phone      String?   @unique
-  gender     Gender
-  dob        DateTime?
-  visibility Boolean   @default(true)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  userId     Int       @unique
-  user       users     @relation(fields: [userId], references: [id])
+  id          Int       @id @default(autoincrement())
+  firstname   String?
+  lastname    String?
+  Username    String?   @unique // Used for login, can also be a display identifier
+  displayName String? // Added: A more user-friendly display name (maps to user?.name in frontend settings)
+  phone       String?   @unique
+  gender      Gender? // Modified: Made optional to align with common practice and frontend flexibility
+  dob         DateTime?
+  visibility  Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      Int       @unique
+  user        users     @relation(fields: [userId], references: [id])
+
+  // New fields for Dashboard and Profile data, derived from frontend expectations
+  avatar           String? @default("https://avatar.iran.liara.run/public/boy") // Profile picture URL
+  proficiencyLevel String? // CEFR level (e.g., "A1", "B2") - if not from userLanguage
+  learningGoals    String? // User's learning objectives (e.g., "Travel", "Business")
+
+  learningFocus String[] // Array of learning focus areas (e.g., ["Speaking", "Vocabulary"])
+
+  // Notification preferences, derived from frontend expectations
+  dailyReminders           Boolean @default(true)
+  weeklyProgressReports    Boolean @default(true)
+  achievementNotifications Boolean @default(true)
+  newFeatureAnnouncements  Boolean @default(true)
 
   @@map("userinfo")
 }
@@ -53,9 +70,48 @@ model session {
   id        Int      @id @default(autoincrement())
   userId    Int      @unique
   token     String   @unique
+  expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      users    @relation(fields: [userId], references: [id])
 
   @@map("session")
+}
+
+model otp {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  otp       String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model gamePoints {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @unique
+  points      Int      @default(0)
+  xp          Int      @default(0) // Total Experience Points
+  streak      Int      @default(0) // Current daily streak
+  dailyXPGoal Int?     @default(50) // Daily XP target
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        users    @relation(fields: [userId], references: [id])
+
+  @@map("game_points")
+}
+
+model userLanguage {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  first_language    String?
+  learning_language String?
+  level             String?   @default("Beginner")
+  level_in_number   Int?      @default(1) // Numeric representation of proficiency level
+  visibility        Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              users    @relation(fields: [userId], references: [id])
+
+  @@map("user_language")
 }
