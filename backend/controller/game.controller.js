@@ -7,11 +7,12 @@ const prisma = new PrismaClient();
 export const wordMeaning = async (req, res) => {
   try {
     const user = req.user;
+    
 
     const targetLanguage =
       user?.userLanguage?.[0]?.learning_language || "English";
     const proficiency = user?.userLanguage?.[0]?.level || "Beginner";
-    const nativeLanguage = user?.userInfo?.nativeLanguage || "hindi";
+    const nativeLanguage = user?.userLanguage?.[0]?.first_language || "hindi";
 
     const prompt = `
 You are a language tutor.
@@ -180,15 +181,14 @@ export const givePointsForWordGame = async (req, res) => {
 export const makeSentence = async (req, res) => {
   try {
     const user = req.user;
-    console.log("User:", user);
 
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.setHeader("Transfer-Encoding", "chunked");
     res.setHeader("Cache-Control", "no-cache");
-    const targetLanguage =
+
+   const targetLanguage =
       user?.userLanguage?.[0]?.learning_language || "English";
     const proficiency = user?.userLanguage?.[0]?.level || "Beginner";
-    const nativeLanguage = user?.userInfo?.nativeLanguage || "Gujarati"; // make sure you store native language
+    const nativeLanguage = user?.userLanguage?.[0]?.first_language || "hindi";
 
     const prompt = `
 You are a professional language tutor.
@@ -232,6 +232,98 @@ Now output 5 such sentence pairs in the exact format above.
     const decoder = new TextDecoder();
 
     let buffer = "";
+    let resultText = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop(); // keep incomplete
+
+      for (const line of lines) {
+        if (!line.trim()) continue;
+
+        const json = JSON.parse(line);
+
+        if (json.response) {
+          resultText += json.response;
+        }
+      }
+    }
+
+    res.send(resultText.trim());
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error while generating AI response.");
+  }
+};
+
+
+export const conversationAI = async (req, res) => {
+  try {
+    const user = req.user;
+    const { message } = req.body;
+
+    if (!message || !message.trim()) {
+      return res.status(400).send("Missing student message.");
+    }
+
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache");
+
+    const targetLanguage =
+      user?.userLanguage?.[0]?.learning_language || "English";
+    const proficiency = user?.userLanguage?.[0]?.level || "Beginner";
+    const nativeLanguage = user?.userLanguage?.[0]?.first_language || "Hindi";
+
+    const prompt = `
+You are a professional language tutor having a casual voice conversation with a student.
+
+✅ The student's native language is: ${nativeLanguage}
+✅ The student is learning: ${targetLanguage} (proficiency: ${proficiency})
+✅ The student just said: "${message}"
+
+⚫ Your task:
+- First, politely point out and correct **any grammar mistakes** in the student's message (if any). If there are no grammar mistakes, say "No grammar mistakes. Well done!"
+- Do NOT correct spelling mistakes.
+- Then, continue the conversation naturally in ${targetLanguage} (3–5 short, chat-like sentences).
+- Encourage the student to reply.
+
+🚫 Do not include explanations or headings.
+🚫 Write only in ${targetLanguage}.
+🚫 Do not include any text in ${nativeLanguage}.
+🚫 Do not include numbers, emojis, or extra text.
+
+✅ Example output:
+No grammar mistakes. Well done!
+Hello! How are you?
+What is your name?
+Do you like music?
+    `.trim();
+
+    const ollamaResponse = await fetch("http://localhost:11434/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "llama3.1",
+        stream: true,
+        prompt,
+      }),
+    });
+
+    if (!ollamaResponse.body) {
+      return res.status(500).send("No response body from Ollama.");
+    }
+
+    const reader = ollamaResponse.body.getReader();
+    const decoder = new TextDecoder();
+
+    let buffer = "";
+    let resultText = "";
 
     while (true) {
       const { done, value } = await reader.read();
@@ -244,17 +336,21 @@ Now output 5 such sentence pairs in the exact format above.
       for (const line of lines) {
         if (!line.trim()) continue;
 
-        const json = JSON.parse(line);
-
-        if (json.response) {
-          res.write(json.response);
+        try {
+          const json = JSON.parse(line);
+          if (json.response) {
+            resultText += json.response;
+          }
+        } catch (err) {
+          console.warn("Skipping invalid JSON:", line);
         }
       }
     }
 
-    res.end();
+    res.send(resultText.trim());
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error while streaming AI response.");
+    res.status(500).send("Error while generating AI response.");
   }
 };
+

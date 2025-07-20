@@ -8,6 +8,7 @@ import {
   verifyOtp,
   resetPassword,
   updateAccountDetails,
+  setLanguage,
 } from "../controller/auth.controller.js";
 import { verifyJWT } from "../middleware/middleware.js";
 
@@ -19,7 +20,8 @@ route.post("/login", loginUser);
 route.post("/req-reset-password", requestPasswordReset);
 route.post("/reset-password", resetPassword);
 route.post("/logout", logoutUser);
-route.post("/get-current-user",verifyJWT, getCurrentUser);
+route.get("/get-current-user",verifyJWT, getCurrentUser);
 route.post("/update-Account-Details", verifyJWT, updateAccountDetails);
+route.post("/setLanguage",verifyJWT,setLanguage);
 
 export default route;

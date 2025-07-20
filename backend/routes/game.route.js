@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  conversationAI,
   givePointsForWordGame,
   makeSentence,
   wordMeaning,
@@ -11,5 +12,6 @@ const route = express.Router();
 route.post("/wordgame", verifyJWT, wordMeaning);
 route.post("/wordgame/addpoint", verifyJWT, givePointsForWordGame);
 route.post("/makesentence", verifyJWT, makeSentence);
+route.post("/conversationAI", verifyJWT, conversationAI); // Updated function name
 
 export default route;

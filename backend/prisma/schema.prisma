@@ -104,10 +104,10 @@ model gamePoints {
 model userLanguage {
   id                Int      @id @default(autoincrement())
   userId            Int
-  learning_language String
-  proficiency       String
-  level             String   @default("Beginner")
-  level_in_number   Int      @default(1) // Numeric representation of proficiency level
+  first_language    String?
+  learning_language String?
+  level             String?   @default("Beginner")
+  level_in_number   Int?      @default(1) // Numeric representation of proficiency level
   visibility        Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

@@ -10,6 +10,8 @@ const prisma = new PrismaClient();
 
 export const loginUser = asyncHandler(async (req, res) => {
   const { identifier, password } = req.body;
+  console.log(req.body);
+  
 
   if (!identifier || !password) {
     throw new ApiError(400, "Username/email and password are required.");
@@ -340,84 +342,81 @@ export const resetPassword = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, {}, "Password reset successfully."));
 });
-
 export const getCurrentUser = asyncHandler(async (req, res) => {
-  const userId = req.user?.id;
-
-  if (!userId) {
-    return res.status(401).json({
-      success: false,
-      message: "Unauthorized: No user ID found.",
-    });
+  // Ensure the user is authenticated.
+  // The `req.user` object is expected to be populated by an authentication middleware.
+  if (!req.user || !req.user.id) {
+    throw new ApiError(401, "Unauthorized: User not logged in.");
   }
 
+  // Fetch the user from the database using the ID from the authenticated request.
+  // We include `userInfo` to get all associated profile details.
   const user = await prisma.users.findUnique({
-    where: { id: userId },
+    where: {
+      id: req.user.id, // Assuming req.user.id holds the user's unique ID
+    },
     include: {
-      userInfo: true,
-      gamePoints: true,
-      userLanguage: true,
+      userInfo: true, // Include related user information
     },
   });
 
+  // If for some reason the user is not found (e.g., deleted after authentication),
+  // though this should ideally be caught by middleware.
   if (!user) {
-    return res.status(404).json({
-      success: false,
-      message: "User not found.",
-    });
+    throw new ApiError(404, "User not found.");
   }
 
-  const {
-    id,
-    email,
-    role,
-    createdAt,
-    updatedAt,
-    userInfo,
-    gamePoints,
-    userLanguage,
-  } = user;
+  // Manually construct the response data to match the desired flattened frontend structure.
+  // Default values are provided for fields that might be null if not yet set by the user.
+  const responseData = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+    // Flattened fields from userInfo
+    username: user.userInfo?.Username || null,
+    displayName: user.userInfo?.displayName || null,
+    avatar: user.userInfo?.avatar || "https://avatar.iran.liara.run/public/boy", // Default avatar if null
+    phone: user.userInfo?.phone || null,
+    gender: user.userInfo?.gender || null,
+    dob: user.userInfo?.dob || null,
+    proficiencyLevel: user.userInfo?.proficiencyLevel || null,
+    learningGoals: user.userInfo?.learningGoals || null,
+    learningFocus: user.userInfo?.learningFocus || [], // Ensure it's an array
+    nativeLanguage: user.userInfo?.nativeLanguage || null,
+    targetLanguage: user.userInfo?.targetLanguage || null,
+    // Dashboard specific fields (xp, level, streak, dailyXPGoal)
+    xp: user.userInfo?.xp || 0,
+    level: user.userInfo?.level || 1,
+    streak: user.userInfo?.streak || 0,
+    dailyXPGoal: user.userInfo?.dailyXPGoal || 50,
 
-  const response = {
-    id,
-    email,
-    role,
-    createdAt,
-    updatedAt,
-
-    // userInfo fields
-    username: userInfo?.Username ?? null,
-    displayName: userInfo?.displayName ?? null,
-    avatar: userInfo?.avatar ?? "https://avatar.iran.liara.run/public/boy",
-    phone: userInfo?.phone ?? null,
-    gender: userInfo?.gender ?? null,
-    dob: userInfo?.dob ?? null,
-    proficiencyLevel: userInfo?.proficiencyLevel ?? null,
-    learningGoals: userInfo?.learningGoals ?? null,
-    learningFocus: userInfo?.learningFocus ?? [],
-    bio: userInfo?.bio ?? null,
-    country: userInfo?.country ?? null,
-    nativeLanguage: userInfo?.nativeLanguage ?? null,
-    timeZone: userInfo?.timeZone ?? null,
-
-    // Notification Preferences
+    // Nested notification preferences (as per your sample response)
     notificationPreferences: {
-      dailyReminders: userInfo?.dailyReminders ?? true,
-      weeklyProgressReports: userInfo?.weeklyProgressReports ?? true,
-      achievementNotifications: userInfo?.achievementNotifications ?? true,
-      newFeatureAnnouncements: userInfo?.newFeatureAnnouncements ?? true,
+      dailyReminders: user.userInfo?.dailyReminders ?? true, // Use ?? to handle null/undefined
+      weeklyProgressReports: user.userInfo?.weeklyProgressReports ?? true,
+      achievementNotifications: user.userInfo?.achievementNotifications ?? true,
+      newFeatureAnnouncements: user.userInfo?.newFeatureAnnouncements ?? true,
     },
-
-    // Languages
-    languages: userLanguage ?? [],
+    // Fields from your sample response that are NOT in your current schema
+    // and thus will be omitted or need to be added to schema if desired:
+    // bio: null,
+    // country: null,
+    // timeZone: null,
+    // languages: [], // This might be a separate relation (userLanguage)
   };
 
-  return res.status(200).json({
-    success: true,
-    message: "User profile fetched successfully.",
-    data: response,
-  });
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      responseData,
+      "User profile fetched successfully."
+    )
+  );
 });
+
+
 
 
 export const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -425,6 +424,8 @@ export const updateAccountDetails = asyncHandler(async (req, res) => {
   if (!req.user || !req.user.id) {
     throw new ApiError(401, "Unauthorized: User not logged in.");
   }
+
+  console.log(req.body)
 
   const userId = req.user.id;
 
@@ -592,4 +593,45 @@ await prisma.gamePoints.upsert({
     )
   );
 });
+
+
+export const setLanguage = async (req, res) => {
+  const { first, learning } = req.body;
+  const userId = req.user.id;
+
+  if (!first || !learning) {
+    throw new ApiError(400, "Both first and learning languages are required.");
+  }
+
+  if(first==learning){
+    throw new ApiError(400, "First and learning languages cannot be the same.");
+  }
+  const existing = await prisma.userLanguage.findFirst({
+    where: { userId },
+  });
+
+  let data;
+
+  if (existing) {
+    // update existing record
+    data = await prisma.userLanguage.update({
+      where: { id: existing.id }, // use unique id
+      data: {
+        first_language: first,
+        learning_language: learning,
+      },
+    });
+  } else {
+    // create new record
+    data = await prisma.userLanguage.create({
+      data: {
+        userId,
+        first_language: first,
+        learning_language: learning,
+      },
+    });
+  }
+
+  res.json(data);
+};
 
