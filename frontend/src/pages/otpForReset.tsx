@@ -30,9 +30,6 @@ const OTPPageReset: React.FC = () => {
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
-    if (index === 5 && value && newDigits.every(d => d !== "")) {
-      handleSubmit();
-    }
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
@@ -159,7 +156,7 @@ const OTPPageReset: React.FC = () => {
         <Button
           onClick={handleSubmit}
           fullWidth
-          disabled={digits.some(d => d === "") || isSubmitting}
+          disabled={isSubmitting}
         >
           {isSubmitting ? (
             <div className="flex items-center justify-center">
@@ -190,4 +187,4 @@ const OTPPageReset: React.FC = () => {
   );
 };
 
-export default OTPPageReset;    
+export default OTPPageReset;

@@ -329,59 +329,8 @@ const SignupPage = () => {
               </div>
             </div>
 
-            {/* Language Selection */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="nativeLanguage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Native Language
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <GlobeIcon className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <select
-                    id="nativeLanguage"
-                    name="nativeLanguage"
-                    value={formData.nativeLanguage}
-                    onChange={handleChange}
-                    className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  >
-                    <option value="">Select a language</option>
-                    {languages.map(lang => (
-                      <option key={lang} value={lang}>{lang}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              
-              <div>
-                <label htmlFor="targetLanguage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Target Language
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <GlobeIcon className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <select
-                    id="targetLanguage"
-                    name="targetLanguage"
-                    value={formData.targetLanguage}
-                    onChange={handleChange}
-                    className={`appearance-none block w-full pl-10 pr-10 py-2 border ${getError('targetLanguage') ? 'border-red-300' : 'border-gray-300 dark:border-gray-700'} rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white`}
-                  >
-                    <option value="">Select a language</option>
-                    {languages
-                      .filter(lang => lang !== formData.nativeLanguage)
-                      .map(lang => (
-                        <option key={lang} value={lang}>{lang}</option>
-                      ))}
-                  </select>
-                </div>
-                {getError('targetLanguage') && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{getError('targetLanguage')}</p>
-                )}
-              </div>
-            </div>
+           
+            
           </div>
 
           {/* Terms Checkbox */}
@@ -415,6 +364,7 @@ const SignupPage = () => {
              
             >
               {isLoading ? 'Creating account...' : 'Sign up'}
+
             </Button>
           </div>
         </form>

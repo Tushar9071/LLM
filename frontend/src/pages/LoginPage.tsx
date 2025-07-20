@@ -23,21 +23,20 @@ const LoginPage = () => {
     setError('');
     setIsLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          "identifier": email,
-          "password": password
-        }),
-      })
-      console.log(res);
-      const result = await res.json();
-      if (!res.ok) {
-        throw new Error(result.message || 'Login failed');
-      }
+      // const res = await fetch("/api/auth/login", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     "identifier": email,
+      //     "password": password
+      //   }),
+      // })
+      // const result = await res.json();
+      // if (!res.ok) {
+      //   throw new Error(result.message || 'Login failed');
+      // }
 
       await login(email, password);
       navigate('/dashboard');

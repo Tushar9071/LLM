@@ -15,10 +15,13 @@ const Navbar = () => {
 
   const {
     isAuthenticated,
-    user,
+    
     logout
   } = useAuth();
 
+
+  const userString = localStorage.getItem("user");
+const user = userString ? JSON.parse(userString) : null;
   const location = useLocation();
   useEffect(() => {
     const handleScroll = () => {
@@ -95,7 +98,7 @@ const Navbar = () => {
             scale: 1.05
           }}>
             <Link to="/dashboard" className="flex items-center space-x-2">
-              <img src={user?.avatar} alt={user?.name} className="w-8 h-8 rounded-full object-cover border-2 border-blue-500" />
+              <img src={user?.image} alt={user?.name} className="w-8 h-8 rounded-full object-cover border-2 border-blue-500" />
               <span className="font-medium">{user?.name}</span>
             </Link>
           </motion.div>

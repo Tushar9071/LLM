@@ -3,19 +3,22 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-interface Props {
-  children: JSX.Element;
-}
+const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
+  const { isAuthenticated, isProfileComplete } = useAuth();
 
-const ProtectedRoute: React.FC<Props> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-
+  // If user is not logged in, redirect to login page.
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
+  // If user is logged in BUT their profile is not complete,
+  // redirect them to the profile setup page.
+  // if (!isProfileComplete) {
+  //   // return <Navigate to="/profilesetup" replace />;
+  // }
+
+  // If logged in and profile is complete, show the page.
   return children;
 };
 
 export default ProtectedRoute;
-
