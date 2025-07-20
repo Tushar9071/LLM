@@ -23,11 +23,14 @@ import ThemeInitializer from "./components/ThemeInitializer";
 import ProtectedRoute from "./components/ProtectedRoute"; // ✅ Import this
 import OTPPageReset from "./pages/otpForReset";
 import NotFoundPage from "./pages/NotFoundPage";
+import { Toaster } from "react-hot-toast";
 
 export function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
+              <Toaster position="top-right" reverseOrder={false} />
+
         <Router>
           <ScrollToTop />
           <ThemeInitializer />
