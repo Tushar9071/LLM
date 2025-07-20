@@ -5,6 +5,7 @@ import { CalendarIcon, TrophyIcon, BookOpenIcon, BarChart3Icon, BrainIcon, StarI
 import XPProgress from '../components/XPProgress';
 import StreakCounter from '../components/StreakCounter';
 import Button from '../components/Button';
+import toast from 'react-hot-toast';
 
 interface Activity {
   date: string;
@@ -39,22 +40,33 @@ const [formData, setFormData] = useState({
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Form data:', formData);
-    fetch("/api/auth/setLanguage",{
-      method:"POST",
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  console.log('Form data:', formData);
+
+  try {
+    const res = await fetch("/api/auth/setLanguage", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         first: formData.nativeLanguage,
-        learning: formData.targetLanguage
+        learning: formData.targetLanguage,
       }),
-    })
-    // Here you would typically send this data to your backend
-    // or update your global state
-  };
+    });
+
+    if (res.ok) {
+      toast.success("Language preferences updated successfully!");
+    } else {
+      const errorData = await res.json();
+      toast.error(errorData.message || "Something went wrong!");
+    }
+  } catch (error) {
+    toast.error("Network error! Please try again.");
+    console.error("Error:", error);
+  }
+};
 
 
   const [activeTab, setActiveTab] = useState('overview');
