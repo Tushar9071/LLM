@@ -59,12 +59,12 @@ const LandingPage = () => {
     language: 'French'
   }];
   return <div className="pt-16 overflow-hidden relative">
-      <AnimatedBackground />
-      {/* Hero Section */}
-      <section ref={ref} className="relative bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 pt-20 pb-32">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center">
-            <motion.div className="lg:w-1/2 mb-10 lg:mb-0 z-10" initial={{
+    <AnimatedBackground />
+    {/* Hero Section */}
+    <section ref={ref} className="relative bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 pt-20 pb-32">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col lg:flex-row items-center">
+          <motion.div className="lg:w-1/2 mb-10 lg:mb-0 z-10" initial={{
             opacity: 0,
             x: -50
           }} animate={{
@@ -73,7 +73,7 @@ const LandingPage = () => {
           }} transition={{
             duration: 0.5
           }}>
-              <motion.h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight" initial={{
+            <motion.h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight" initial={{
               opacity: 0
             }} animate={{
               opacity: 1
@@ -81,18 +81,18 @@ const LandingPage = () => {
               duration: 0.5,
               delay: 0.2
             }}>
-                <span className="block">Master Any Language</span>
-                <motion.span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600" animate={{
+              <span className="block">Master Any Language</span>
+              <motion.span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600" animate={{
                 backgroundPosition: ['0% center', '100% center']
               }} transition={{
                 duration: 5,
                 repeat: Infinity,
                 repeatType: 'reverse'
               }}>
-                  with AI
-                </motion.span>
-              </motion.h1>
-              <motion.p className="text-xl text-gray-600 dark:text-gray-300 mb-8" initial={{
+                with AI
+              </motion.span>
+            </motion.h1>
+            <motion.p className="text-xl text-gray-600 dark:text-gray-300 mb-8" initial={{
               opacity: 0
             }} animate={{
               opacity: 1
@@ -100,10 +100,10 @@ const LandingPage = () => {
               duration: 0.5,
               delay: 0.4
             }}>
-                Your personal language coach — wherever you are. Learn through
-                conversation, get instant feedback, and track your progress.
-              </motion.p>
-              <motion.div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4" initial={{
+              Your personal language coach — wherever you are. Learn through
+              conversation, get instant feedback, and track your progress.
+            </motion.p>
+            <motion.div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4" initial={{
               opacity: 0
             }} animate={{
               opacity: 1
@@ -111,15 +111,15 @@ const LandingPage = () => {
               duration: 0.5,
               delay: 0.6
             }}>
-                <Button to="/signup" size="lg" icon={<ArrowRightIcon className="w-5 h-5" />} iconPosition="right">
-                  Start Learning
-                </Button>
-                <Button to="/chat" variant="outline" size="lg">
-                  Try a Demo
-                </Button>
-              </motion.div>
+              <Button to="/signup" size="lg" icon={<ArrowRightIcon className="w-5 h-5" />} iconPosition="right">
+                Start Learning
+              </Button>
+              <Button to="/chat" variant="outline" size="lg">
+                Try a Demo
+              </Button>
             </motion.div>
-            <motion.div className="lg:w-1/2 relative z-10" initial={{
+          </motion.div>
+          <motion.div className="lg:w-1/2 relative z-10" initial={{
             opacity: 0,
             x: 50
           }} animate={{
@@ -132,7 +132,7 @@ const LandingPage = () => {
             y,
             opacity
           }}>
-              <motion.div whileHover={{
+            <motion.div whileHover={{
               scale: 1.02,
               boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
             }} transition={{
@@ -140,10 +140,10 @@ const LandingPage = () => {
               stiffness: 300,
               damping: 20
             }}>
-                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80" alt="People learning languages with AI" className="rounded-lg shadow-xl" />
-              </motion.div>
-              {/* Floating Elements */}
-              <motion.div className="absolute -top-10 -right-10 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-10" initial={{
+              <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80" alt="People learning languages with AI" className="rounded-lg shadow-xl" />
+            </motion.div>
+            {/* Floating Elements */}
+            <motion.div className="absolute -top-10 -right-10 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-10" initial={{
               opacity: 0,
               y: 20
             }} animate={{
@@ -157,8 +157,8 @@ const LandingPage = () => {
               y: -5,
               boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
             }}>
-                <div className="flex items-center">
-                  <motion.div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 mr-3" animate={{
+              <div className="flex items-center">
+                <motion.div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 mr-3" animate={{
                   scale: [1, 1.1, 1],
                   rotate: [0, 5, 0, -5, 0]
                 }} transition={{
@@ -166,17 +166,17 @@ const LandingPage = () => {
                   repeat: Infinity,
                   repeatDelay: 3
                 }}>
-                    <TrophyIcon className="w-5 h-5" />
-                  </motion.div>
-                  <div>
-                    <p className="text-sm font-medium">12-day streak!</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      Keep it going
-                    </p>
-                  </div>
+                  <TrophyIcon className="w-5 h-5" />
+                </motion.div>
+                <div>
+                  <p className="text-sm font-medium">12-day streak!</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    Keep it going
+                  </p>
                 </div>
-              </motion.div>
-              <motion.div className="absolute -bottom-10 -left-10 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-10" initial={{
+              </div>
+            </motion.div>
+            <motion.div className="absolute -bottom-10 -left-10 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 z-10" initial={{
               opacity: 0,
               y: 20
             }} animate={{
@@ -190,8 +190,8 @@ const LandingPage = () => {
               y: -5,
               boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
             }}>
-                <div className="flex items-center">
-                  <motion.div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mr-3" animate={{
+              <div className="flex items-center">
+                <motion.div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mr-3" animate={{
                   scale: [1, 1.1, 1],
                   rotate: [0, 5, 0, -5, 0]
                 }} transition={{
@@ -200,41 +200,41 @@ const LandingPage = () => {
                   repeatDelay: 4,
                   delay: 1
                 }}>
-                    <MessageCircleIcon className="w-5 h-5" />
-                  </motion.div>
-                  <div>
-                    <p className="text-sm font-medium">AI Conversation</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      Practice anytime
-                    </p>
-                  </div>
+                  <MessageCircleIcon className="w-5 h-5" />
+                </motion.div>
+                <div>
+                  <p className="text-sm font-medium">AI Conversation</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    Practice anytime
+                  </p>
                 </div>
-              </motion.div>
+              </div>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
-        {/* Wave SVG */}
-        <div className="absolute bottom-0 left-0 w-full overflow-hidden">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="w-full h-auto">
-            <path fill="currentColor" fillOpacity="1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,213.3C1248,235,1344,213,1392,202.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" className="text-white dark:text-gray-800"></path>
-          </svg>
-        </div>
-      </section>
-      {/* Features Section */}
-      <section id="features" className="py-20 relative z-10">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <motion.div initial={{
+      </div>
+      {/* Wave SVG */}
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="w-full h-auto">
+          <path fill="currentColor" fillOpacity="1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,213.3C1248,235,1344,213,1392,202.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" className="text-white dark:text-gray-800"></path>
+        </svg>
+      </div>
+    </section>
+    {/* Features Section */}
+    <section id="features" className="py-20 relative z-10">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-16">
+          <motion.div initial={{
             opacity: 0
           }} whileInView={{
             opacity: 1
           }} viewport={{
             once: true
           }} className="inline-flex items-center bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-4 py-1 rounded-full text-sm font-medium mb-4">
-              <SparklesIcon className="w-4 h-4 mr-1" />
-              AI-Powered Learning
-            </motion.div>
-            <motion.h2 className="text-3xl md:text-4xl font-bold mb-4" initial={{
+            <SparklesIcon className="w-4 h-4 mr-1" />
+            AI-Powered Learning
+          </motion.div>
+          <motion.h2 className="text-3xl md:text-4xl font-bold mb-4" initial={{
             opacity: 0,
             y: 20
           }} whileInView={{
@@ -245,9 +245,9 @@ const LandingPage = () => {
           }} transition={{
             duration: 0.5
           }}>
-              How LinguaAI Works
-            </motion.h2>
-            <motion.p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto" initial={{
+            How LinguaAI Works
+          </motion.h2>
+          <motion.p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto" initial={{
             opacity: 0,
             y: 20
           }} whileInView={{
@@ -259,30 +259,30 @@ const LandingPage = () => {
             duration: 0.5,
             delay: 0.2
           }}>
-              Our AI-powered platform makes language learning effective,
-              engaging, and personalized to your needs.
-            </motion.p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => <FeatureCard key={index} icon={feature.icon} title={feature.title} description={feature.description} delay={index * 0.1} />)}
-          </div>
+            Our AI-powered platform makes language learning effective,
+            engaging, and personalized to your needs.
+          </motion.p>
         </div>
-      </section>
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 bg-gray-50 dark:bg-gray-800/50 relative z-10">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <motion.div initial={{
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature, index) => <FeatureCard key={index} icon={feature.icon} title={feature.title} description={feature.description} delay={index * 0.1} />)}
+        </div>
+      </div>
+    </section>
+    {/* Testimonials Section */}
+    <section id="testimonials" className="py-20 bg-gray-50 dark:bg-gray-800/50 relative z-10">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-16">
+          <motion.div initial={{
             opacity: 0
           }} whileInView={{
             opacity: 1
           }} viewport={{
             once: true
           }} className="inline-flex items-center bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-4 py-1 rounded-full text-sm font-medium mb-4">
-              <TrophyIcon className="w-4 h-4 mr-1" />
-              Success Stories
-            </motion.div>
-            <motion.h2 className="text-3xl md:text-4xl font-bold mb-4" initial={{
+            <TrophyIcon className="w-4 h-4 mr-1" />
+            Success Stories
+          </motion.div>
+          <motion.h2 className="text-3xl md:text-4xl font-bold mb-4" initial={{
             opacity: 0,
             y: 20
           }} whileInView={{
@@ -293,9 +293,9 @@ const LandingPage = () => {
           }} transition={{
             duration: 0.5
           }}>
-              What Our Users Say
-            </motion.h2>
-            <motion.p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto" initial={{
+            What Our Users Say
+          </motion.h2>
+          <motion.p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto" initial={{
             opacity: 0,
             y: 20
           }} whileInView={{
@@ -307,19 +307,19 @@ const LandingPage = () => {
             duration: 0.5,
             delay: 0.2
           }}>
-              Join thousands of satisfied learners who have transformed their
-              language skills with LinguaAI.
-            </motion.p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => <TestimonialCard key={index} name={testimonial.name} role={testimonial.role} content={testimonial.content} avatar={testimonial.avatar} rating={testimonial.rating} language={testimonial.language} />)}
-          </div>
+            Join thousands of satisfied learners who have transformed their
+            language skills with LinguaAI.
+          </motion.p>
         </div>
-      </section>
-      {/* CTA Section */}
-      <section className="py-20 relative z-10">
-        <div className="container mx-auto px-4">
-          <motion.div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-10 md:p-16 text-center text-white" initial={{
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {testimonials.map((testimonial, index) => <TestimonialCard key={index} name={testimonial.name} role={testimonial.role} content={testimonial.content} avatar={testimonial.avatar} rating={testimonial.rating} language={testimonial.language} />)}
+        </div>
+      </div>
+    </section>
+    {/* CTA Section */}
+    <section className="py-20 relative z-10">
+      <div className="container mx-auto px-4">
+        <motion.div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-10 md:p-16 text-center text-white" initial={{
           opacity: 0,
           y: 20
         }} whileInView={{
@@ -332,7 +332,7 @@ const LandingPage = () => {
         }} whileHover={{
           boxShadow: '0 25px 50px -12px rgba(59, 130, 246, 0.25)'
         }}>
-            <motion.h2 className="text-3xl md:text-4xl font-bold mb-6" initial={{
+          <motion.h2 className="text-3xl md:text-4xl font-bold mb-6" initial={{
             opacity: 0,
             scale: 0.9
           }} whileInView={{
@@ -344,9 +344,9 @@ const LandingPage = () => {
             duration: 0.5,
             delay: 0.2
           }}>
-              Ready to Start Your Language Journey?
-            </motion.h2>
-            <motion.p className="text-xl mb-8 max-w-2xl mx-auto" initial={{
+            Ready to Start Your Language Journey?
+          </motion.h2>
+          <motion.p className="text-xl mb-8 max-w-2xl mx-auto" initial={{
             opacity: 0
           }} whileInView={{
             opacity: 1
@@ -356,10 +356,10 @@ const LandingPage = () => {
             duration: 0.5,
             delay: 0.4
           }}>
-              Join LinguaAI today and experience the future of language
-              learning. Your first week is on us!
-            </motion.p>
-            <motion.div initial={{
+            Join LinguaAI today and experience the future of language
+            learning. Your first week is on us!
+          </motion.p>
+          <motion.div initial={{
             opacity: 0,
             y: 20
           }} whileInView={{
@@ -371,13 +371,13 @@ const LandingPage = () => {
             duration: 0.5,
             delay: 0.6
           }}>
-              <Button to="/signup" variant="primary" size="lg" className="bg-white text-blue-600 hover:bg-gray-100" icon={<ArrowRightIcon className="w-5 h-5" />} iconPosition="right">
-                Get Started for Free
-              </Button>
-            </motion.div>
+            <Button to="/signup" variant="primary" size="lg" className="bg-white text-black dark:text-blue-600 hover:bg-gray-200" icon={<ArrowRightIcon className="w-5 h-5" />} iconPosition="right">
+              Get Started for Free
+            </Button>
           </motion.div>
-        </div>
-      </section>
-    </div>;
+        </motion.div>
+      </div>
+    </section>
+  </div>;
 };
 export default LandingPage;
