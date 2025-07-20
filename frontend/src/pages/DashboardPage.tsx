@@ -5,6 +5,7 @@ import { CalendarIcon, TrophyIcon, BookOpenIcon, BarChart3Icon, BrainIcon, StarI
 import XPProgress from '../components/XPProgress';
 import StreakCounter from '../components/StreakCounter';
 import Button from '../components/Button';
+
 interface Activity {
   date: string;
   xp: number;
@@ -19,9 +20,43 @@ interface Badge {
   maxProgress?: number;
 }
 const DashboardPage = () => {
-  const {
-    user
-  } = useAuth();
+  
+  const userString = localStorage.getItem("user");
+const user = userString ? JSON.parse(userString) : null;
+console.log(user);
+const [formData, setFormData] = useState({
+    nativeLanguage: user?.nativeLanguage || 'English',
+    targetLanguage: user?.targetLanguage || 'Spanish'
+  });
+
+  // Handle changes in both select inputs
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Form data:', formData);
+    fetch("/api/auth/setLanguage",{
+      method:"POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        first: formData.nativeLanguage,
+        learning: formData.targetLanguage
+      }),
+    })
+    // Here you would typically send this data to your backend
+    // or update your global state
+  };
+
+
   const [activeTab, setActiveTab] = useState('overview');
   // Mock data for activities (last 30 days)
   const activities: Activity[] = Array.from({
@@ -122,7 +157,7 @@ const DashboardPage = () => {
                   </div>
                 </div>
                 <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                  Level {user?.level || 7}
+                  Level {user?.data?.level || 7}
                 </div>
                 <XPProgress currentXP={user?.xp || 3240} levelXP={4000} level={user?.level || 7} showLevel={false} />
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -188,12 +223,7 @@ const DashboardPage = () => {
                 }}>
                     <BookOpenIcon className="w-6 h-6" />
                   </motion.div>
-                  <div>
-                    <h3 className="text-lg font-semibold">Vocabulary</h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      Words learned
-                    </p>
-                  </div>
+                 
                 </div>
                 <div className="text-3xl font-bold text-green-600 dark:text-green-400">
                   342
@@ -349,121 +379,101 @@ const DashboardPage = () => {
             </motion.div>
           </div>;
       case 'settings':
-        return <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6" initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          duration: 0.4
-        }}>
-            <h3 className="text-lg font-semibold mb-6">Account Settings</h3>
-            <div className="space-y-6">
+  return (
+    <motion.div 
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6" 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <h3 className="text-lg font-semibold mb-6">Language Settings</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="space-y-6">
+          <div>
+            <h4 className="text-md font-medium mb-4">Language Preferences</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h4 className="text-md font-medium mb-4">
-                  Profile Information
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Full Name
-                    </label>
-                    <input type="text" id="name" defaultValue={user?.name} className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" />
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Email Address
-                    </label>
-                    <input type="email" id="email" defaultValue={user?.email} className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" />
-                  </div>
-                </div>
+                <label 
+                  htmlFor="nativeLanguage" 
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >
+                  Native Language
+                </label>
+                <select 
+                  id="nativeLanguage"
+                  value={formData.nativeLanguage}
+                  onChange={handleChange}
+                  className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="Spanish">Spanish</option>
+                  <option value="English">English</option>
+                  <option value="French">French</option>
+                  <option value="German">German</option>
+                  <option value="Chinese">Chinese</option>
+                  <option value="Hindi">Hindi</option>
+                    <option value="Japanese">Japanese</option>
+                  <option value="Italian">Italian</option>
+                  <option value="Korean">Korean</option>
+                  <option value="gujrati">gujrati</option>
+                  <option value="Bengali">Bengali</option>
+                  <option value="Punjabi">Punjabi</option>
+                  <option value="Marathi">Marathi</option>
+                  <option value="Tamil">Tamil</option>
+                  <option value="Telugu">Telugu</option>
+                  <option value="Kannada">Kannada</option>
+                  <option value="Malayalam">Malayalam</option>
+                  <option value="Urdu">Urdu</option>
+                  
+                </select>
               </div>
               <div>
-                <h4 className="text-md font-medium mb-4">
-                  Language Preferences
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="nativeLanguage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Native Language
-                    </label>
-                    <select id="nativeLanguage" defaultValue={user?.nativeLanguage} className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                      <option>English</option>
-                      <option>Spanish</option>
-                      <option>French</option>
-                      <option>German</option>
-                      <option>Chinese</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="targetLanguage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Target Language
-                    </label>
-                    <select id="targetLanguage" defaultValue={user?.targetLanguage} className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                      <option>Spanish</option>
-                      <option>English</option>
-                      <option>French</option>
-                      <option>German</option>
-                      <option>Chinese</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h4 className="text-md font-medium mb-4">Learning Goals</h4>
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="dailyGoal" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Daily XP Goal
-                    </label>
-                    <select id="dailyGoal" defaultValue="50" className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                      <option>20</option>
-                      <option>50</option>
-                      <option>100</option>
-                      <option>200</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Learning Focus
-                    </label>
-                    <div className="space-y-2">
-                      {['Speaking', 'Listening', 'Reading', 'Writing', 'Vocabulary'].map(focus => <div key={focus} className="flex items-center">
-                          <input id={`focus-${focus}`} type="checkbox" defaultChecked={['Speaking', 'Vocabulary'].includes(focus)} className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                          <label htmlFor={`focus-${focus}`} className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                            {focus}
-                          </label>
-                        </div>)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h4 className="text-md font-medium mb-4">Notifications</h4>
-                <div className="space-y-3">
-                  {['Daily reminders', 'Weekly progress reports', 'Achievement notifications', 'New feature announcements'].map(notification => <div key={notification} className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {notification}
-                      </span>
-                      <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                        <input type="checkbox" id={`notification-${notification}`} defaultChecked className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-300 border-4 border-gray-300 dark:border-gray-700 appearance-none cursor-pointer" />
-                        <label htmlFor={`notification-${notification}`} className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-700 cursor-pointer"></label>
-                      </div>
-                    </div>)}
-                </div>
-              </div>
-              <div className="pt-4">
-                <motion.div whileHover={{
-                scale: 1.05
-              }} whileTap={{
-                scale: 0.95
-              }}>
-                  <Button>Save Changes</Button>
-                </motion.div>
+                <label 
+                  htmlFor="targetLanguage" 
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >
+                  Target Language
+                </label>
+                <select 
+                  id="targetLanguage"
+                  value={formData.targetLanguage}
+                  onChange={handleChange}
+                  className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                >
+                 <option value="Spanish">Spanish</option>
+                  <option value="English">English</option>
+                  <option value="French">French</option>
+                  <option value="German">German</option>
+                  <option value="Chinese">Chinese</option>
+                  <option value="Hindi">Hindi</option>
+                    <option value="Japanese">Japanese</option>
+                  <option value="Italian">Italian</option>
+                  <option value="Korean">Korean</option>
+                  <option value="gujrati">gujrati</option>
+                  <option value="Bengali">Bengali</option>
+                  <option value="Punjabi">Punjabi</option>
+                  <option value="Marathi">Marathi</option>
+                  <option value="Tamil">Tamil</option>
+                  <option value="Telugu">Telugu</option>
+                  <option value="Kannada">Kannada</option>
+                  <option value="Malayalam">Malayalam</option>
+                  <option value="Urdu">Urdu</option>
+  
+                </select>
               </div>
             </div>
-          </motion.div>;
+          </div>
+          <div className="pt-4">
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button type="submit">Save Changes</Button>
+            </motion.div>
+          </div>
+        </div>
+      </form>
+    </motion.div>
+  );
       default:
         return null;
     }
@@ -482,7 +492,7 @@ const DashboardPage = () => {
           duration: 0.5
         }}>
             <div className="flex flex-col md:flex-row items-center md:items-start">
-              <motion.img src={user?.avatar} alt={user?.name} className="w-24 h-24 rounded-full object-cover border-4 border-blue-100 dark:border-blue-900 mb-4 md:mb-0 md:mr-6" initial={{
+              <motion.img src={user?.image} alt={user?.data?.avatar} className="w-24 h-24 rounded-full object-cover border-4 border-blue-100 dark:border-blue-900 mb-4 md:mb-0 md:mr-6" initial={{
               scale: 0.8
             }} animate={{
               scale: 1
@@ -500,7 +510,7 @@ const DashboardPage = () => {
               }} transition={{
                 delay: 0.2
               }}>
-                  {user?.name}
+                  {user?.data?.data?.username}
                 </motion.h1>
                 <motion.p className="text-gray-600 dark:text-gray-400 mb-4" initial={{
                 opacity: 0
@@ -595,7 +605,7 @@ const DashboardPage = () => {
             </motion.div>
           </AnimatePresence>
         </div>
-      </div>
+      </div>l
     </div>;
 };
 export default DashboardPage;
